@@ -1,10 +1,15 @@
 import asyncio
 from websockets.sync.client import connect
+import time
+import random
 
-def hello():
-    with connect("ws://localhost:8765") as websocket:
-        websocket.send("Hello world!")
-        message = websocket.recv()
-        print(f"Received: {message}")
+async def hello():
+    while True:
+        with connect("ws://localhost:8765") as websocket:
+            num = str(random.randrange(20))
+            websocket.send("2/" + num)
+            message = websocket.recv()
+            print(f"Received: {message}")
+            time.sleep(3)
 
-hello()
+asyncio.run(hello())
