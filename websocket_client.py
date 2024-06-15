@@ -5,12 +5,13 @@ import random
 from connection import Client
 
 async def main():
-    conn = Client(None)
+    conn = Client(None, None)
     with connect("ws://localhost:8765") as websocket:
         if not conn.id:
             websocket.send("C")
             message = websocket.recv()
-            conn.id = message
+            conn.id = message[0]
+            conn.perfil = message[1]
 
         while True:
             num = str(random.randrange(20))
