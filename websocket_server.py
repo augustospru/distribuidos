@@ -18,29 +18,32 @@ async def echo(websocket: ws.WebSocketServerProtocol):
             has_lider = await add_connection(websocket, connections_buff, has_lider)
 
         else:
-            id_message = int(message[0])
+            id_client = int(message[0])
             message_func = message[1]
 
-            match message_func:
-                case "G":
-                    await group_messages(message, websocket, group_list)
-                
-                case "H":
-                    await has_messages(message, websocket, connections_buff, group_list)
+            try:
+                match message_func:
+                    case "G":
+                        await group_messages(message, websocket, group_list)
+                    
+                    case "H":
+                        await has_messages(message, websocket, connections_buff, group_list)
 
-                case "A":
-                    await assert_messages(message, websocket, connections_buff, has_lider)
+                    case "A":
+                        await assert_messages(message, websocket, connections_buff, has_lider)
 
-                case "N":
-                    await nack_messages(message, websocket, connections_buff, has_lider)
+                    case "N":
+                        await nack_messages(message, websocket, connections_buff, has_lider)
 
-                case "M":
-                    await peer_2_peer_messages(message, websocket, connections_buff, has_lider)
-                        
-                case _:
-                    # messages_buffer[id_message - 1] = message
-                    # await websocket.send('-'.join(messages_buffer))
-                    await websocket.send("F")
+                    case "M":
+                        await peer_2_peer_messages(message, websocket, connections_buff, has_lider)
+                            
+                    case _:
+                        # messages_buffer[id_message - 1] = message
+                        # await websocket.send('-'.join(messages_buffer))
+                        await websocket.send("T")
+            except:
+                await websocket.send("F")
 
 async def main():
     async with serve(echo, "localhost", 8765):

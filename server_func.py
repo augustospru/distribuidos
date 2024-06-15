@@ -65,6 +65,7 @@ async def has_messages(
         if peer_message: await websocket.send(peer_message)
         else: await websocket.send("F")
     
+    else: await websocket.send("F")
     return 
 
 #assert with group if all messages were gotten
