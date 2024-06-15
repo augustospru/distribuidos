@@ -1,14 +1,18 @@
 import asyncio
 from websockets.sync.client import connect
-import time
-import random
+import sys
 from classes import Client
 
 async def main():
     conn = Client(None, None)
     with connect("ws://localhost:8765") as websocket:
+        args = sys.argv[1:]
+        id_group = ""
+        if args and args[0] == '-g': 
+            id_group = args[1]
+            
         if not conn.id:
-            websocket.send("C")
+            websocket.send("C" + id_group)
             message = websocket.recv()
             conn.id = message[0]
             conn.perfil = message[1]
