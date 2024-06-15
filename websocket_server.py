@@ -14,8 +14,8 @@ async def echo(websocket: ws.WebSocketServerProtocol):
         print(message)
 
         #new connection
-        if message == "C":
-            has_lider = await add_connection(websocket, connections_buff, has_lider)
+        if message[0] == "C":
+            has_lider = await add_connection(message, websocket, connections_buff, group_list, has_lider)
 
         else:
             id_client = int(message[0])

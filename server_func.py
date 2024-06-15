@@ -1,10 +1,13 @@
 import websockets as ws
 from classes import Connection, Group
+import random
 
 #add new client to list of connections
 async def add_connection(
+    message: ws.Data,
     websocket: ws.WebSocketServerProtocol, 
     connections_buff: list[Connection],
+    group_list: list[Group],
     has_lider: bool
 ):
     last_id = 1
@@ -16,9 +19,16 @@ async def add_connection(
         perfil = "L"
         has_lider = True
 
-    await websocket.send(str(last_id) + perfil)
+    id_group = ""
+    if len(message) > 1: id_group = message[1] #add presend group
+    else: id_group = str(random.randrange(3)) #add to random group
 
-    connections_buff.append(Connection(str(last_id), True, perfil))
+    client = Connection(str(last_id), True, perfil, id_group)
+
+    await websocket.send(str(last_id) + perfil + id_group)
+
+    connections_buff.append(client)
+    group_list[int(client.group) - 1].add_client(client.id)
 
     return has_lider
 
