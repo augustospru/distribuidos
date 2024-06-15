@@ -2,7 +2,7 @@ import asyncio
 from websockets.sync.client import connect
 import time
 import random
-from connection import Client
+from classes import Client
 
 async def main():
     conn = Client(None, None)
@@ -19,6 +19,5 @@ async def main():
             websocket.send(id + msg)
             message = websocket.recv()
             print(f"Received: {message}")
-            time.sleep(3)
 
 asyncio.run(main())

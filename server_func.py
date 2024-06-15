@@ -1,10 +1,9 @@
 import websockets as ws
-from connection import Connection
+from classes import Connection, Group
 
 #add new client to list of connections
 async def add_connection(
     websocket: ws.WebSocketServerProtocol, 
-    messages_buffer: list[str], 
     connections_buff: list[Connection],
     has_lider: bool
 ):
@@ -20,7 +19,6 @@ async def add_connection(
     await websocket.send(str(last_id) + perfil)
 
     connections_buff.append(Connection(str(last_id), True, perfil))
-    messages_buffer.append('')
 
     return has_lider
 
@@ -28,11 +26,15 @@ async def add_connection(
 async def group_messages(
     message: ws.Data,
     websocket: ws.WebSocketServerProtocol, 
-    messages_buffer: list[str], 
-    connections_buff: list[Connection],
-    has_lider: bool
+    group_list: list[Group]
 ):
-    print(message)
+    if len(message) < 5: await websocket.send("F")
+
+    id_emissor = message[0]
+    id_group = int(message[2])
+    message_to = message[3:]
+
+    group_list[id_group - 1].add_message(id_emissor + message_to)
     
     await websocket.send("T")
     return 
@@ -41,20 +43,34 @@ async def group_messages(
 async def has_messages(
     message: ws.Data,
     websocket: ws.WebSocketServerProtocol, 
-    messages_buffer: list[str], 
     connections_buff: list[Connection],
-    has_lider: bool
+    group_list: list[Group]
 ):
-    print(message)
+    if len(message) < 3: await websocket.send("F")
+
+    id_client = int(message[0])
+    get_type = message[2]
+
+    client = connections_buff[id_client - 1]
+
+    if get_type == "G":
+        group_message = group_list[int(client.group) - 1].get_message()
+
+        if group_message: await websocket.send(group_message)
+        else: await websocket.send("F")
+
+
+    if get_type == "P":
+        peer_message = client.get_message()
+        if peer_message: await websocket.send(peer_message)
+        else: await websocket.send("F")
     
-    await websocket.send("T")
     return 
 
 #assert with group if all messages were gotten
 async def assert_messages(
     message: ws.Data,
     websocket: ws.WebSocketServerProtocol, 
-    messages_buffer: list[str], 
     connections_buff: list[Connection],
     has_lider: bool
 ):
@@ -66,8 +82,7 @@ async def assert_messages(
 #send nack response
 async def nack_messages(
     message: ws.Data,
-    websocket: ws.WebSocketServerProtocol, 
-    messages_buffer: list[str], 
+    websocket: ws.WebSocketServerProtocol,  
     connections_buff: list[Connection],
     has_lider: bool
 ):
@@ -80,11 +95,16 @@ async def nack_messages(
 async def peer_2_peer_messages(
     message: ws.Data,
     websocket: ws.WebSocketServerProtocol, 
-    messages_buffer: list[str], 
     connections_buff: list[Connection],
     has_lider: bool
 ):
-    print(message)
+    if len(message) < 4: await websocket.send("F")
+
+    id_emissor = message[0]
+    id_client = int(message[2])
+    message_to = message[3:]
+
+    connections_buff[id_client - 1].add_message(id_emissor + message_to)
     
     await websocket.send("T")
     return 
