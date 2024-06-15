@@ -2,7 +2,7 @@ import asyncio
 from websockets.server import serve
 import websockets as ws
 from connection import Connection
-from server_func import add_connection
+from server_func import add_connection, group_messages, assert_messages, has_messages, nack_messages, peer_2_peer_messages
 
 messages_buffer: list[str] = []
 connections_buff: list[Connection] = []
@@ -19,8 +19,27 @@ async def echo(websocket: ws.WebSocketServerProtocol):
 
         else:
             id_message = int(message[0])
-            messages_buffer[id_message - 1] = message
-            await websocket.send('-'.join(messages_buffer))
+            message_func = message[1]
+
+            match message_func:
+                case "G":
+                    await group_messages(message, websocket, messages_buffer, connections_buff, has_lider)
+                
+                case "H":
+                    await has_messages(message, websocket, messages_buffer, connections_buff, has_lider)
+
+                case "A":
+                    await assert_messages(message, websocket, messages_buffer, connections_buff, has_lider)
+
+                case "N":
+                    await nack_messages(message, websocket, messages_buffer, connections_buff, has_lider)
+
+                case "M":
+                    await peer_2_peer_messages(message, websocket, messages_buffer, connections_buff, has_lider)
+                        
+                case _:
+                    messages_buffer[id_message - 1] = message
+                    await websocket.send('-'.join(messages_buffer))
 
 async def main():
     async with serve(echo, "localhost", 8765):
