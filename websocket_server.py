@@ -33,10 +33,10 @@ async def echo(websocket: ws.WebSocketServerProtocol):
                         await assert_messages(message, websocket, connections_buff, has_lider)
 
                     case "N":
-                        await nack_messages(message, websocket, connections_buff, has_lider)
+                        await nack_messages(message, websocket, connections_buff)
 
                     case "M":
-                        await peer_2_peer_messages(message, websocket, connections_buff, has_lider)
+                        await peer_2_peer_messages(message, websocket, connections_buff)
                             
                     case _:
                         await websocket.send("F")

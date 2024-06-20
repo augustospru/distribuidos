@@ -126,8 +126,7 @@ async def assert_messages(
 async def nack_messages(
     message: ws.Data,
     websocket: ws.WebSocketServerProtocol,  
-    connections_buff: list[Connection],
-    has_lider: bool
+    connections_buff: list[Connection]
 ):
     """
     Estrutura da mensagem:
@@ -154,8 +153,7 @@ async def nack_messages(
 async def peer_2_peer_messages(
     message: ws.Data,
     websocket: ws.WebSocketServerProtocol, 
-    connections_buff: list[Connection],
-    has_lider: bool
+    connections_buff: list[Connection]
 ):
     """
     Estrutura da mensagem:
