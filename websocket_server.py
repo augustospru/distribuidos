@@ -39,9 +39,7 @@ async def echo(websocket: ws.WebSocketServerProtocol):
                         await peer_2_peer_messages(message, websocket, connections_buff, has_lider)
                             
                     case _:
-                        # messages_buffer[id_message - 1] = message
-                        # await websocket.send('-'.join(messages_buffer))
-                        await websocket.send("T")
+                        await websocket.send("F")
             except:
                 await websocket.send("F")
 
