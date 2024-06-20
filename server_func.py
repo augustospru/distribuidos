@@ -41,7 +41,7 @@ async def group_messages(
     """
     Estrutura da mensagem:
     XGYZ[...](/?[Z[...]])
-    X => id_emissor (acoplado pelo servidor)
+    X => id_emissor (acoplado pelo cliente)
     G => identificador da funcao
     Y => id_grupo que se quer enviar a(s) mensagem(ns)
     Z => id_mensagem (acoplada pelo nodo)
@@ -78,7 +78,7 @@ async def has_messages(
     """
     Estrutura da mensagem:
     XH(G/P)
-    X => id_emissor (acoplado pelo servidor)
+    X => id_emissor (acoplado pelo cliente)
     H => identificador da funcao
     G => quero receber mensagem do grupo
     P => quero receber mensagem direta (peer2peer)
@@ -129,7 +129,23 @@ async def nack_messages(
     connections_buff: list[Connection],
     has_lider: bool
 ):
-    print(message)
+    """
+    Estrutura da mensagem:
+    XNYZ[Z..]
+    X => id_emissor (acoplado pelo cliente)
+    N => identificador da funcao
+    Y => id_emissor_original da mensagem
+    Z => id_mensagem perida
+
+    exemplo:
+    caso 1 duas mensagens perdidas: 3N116
+    Informará ao emissor original de id 1 que as mensagens 1 e 6 nao chegaram ao cliente
+    """
+    if len(message) < 4: await websocket.send("F")
+
+    id_emissor_original = int(message[2])
+
+    connections_buff[id_emissor_original - 1].add_message(message)
     
     await websocket.send("T")
     return 
@@ -144,7 +160,7 @@ async def peer_2_peer_messages(
     """
     Estrutura da mensagem:
     XMYZ[...](/?[Z[...]])
-    X => id_emissor (acoplado pelo servidor)
+    X => id_emissor (acoplado pelo cliente)
     M => identificador da funcao
     Y => id_mensagem que se quer enviar a(s) mensagem(ns)
     Z => id_mensagem (acoplada pelo nodo)

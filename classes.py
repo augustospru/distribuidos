@@ -24,7 +24,7 @@ class Client:
     id: str | None = None
     perfil: str | None = None
     group: str = None
-    message_send: str | None = None
+    message_send: list[str] = []
     last_message_rcv: str | None = None
 
     def __init__(self, id, perfil, group = "1"):
@@ -35,11 +35,15 @@ class Client:
     def change_perfil(self, perfil):
         self.perfil = perfil
 
+    def add_message(self, message):
+        self.message_send.append(message)
+
 class Group:
     id: str | None = None
     message_buffer: str | None = None
     id_clients: list[str] = []
     list_nacks: list[str] = []
+    lider_id: str | None = None
 
     def __init__(self, id):
         self.id = id
