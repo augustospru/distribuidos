@@ -23,3 +23,21 @@ async def nack_received(conn: Client, websocket: ClientConnection, nack_recv: li
         print(f"Received: {message}")
 
     return
+
+async def lider_received(conn: Client, websocket: ClientConnection, lider_recv: list[str], id_emissor: str):
+
+    websocket.send(f"{id_emissor}S{conn.group}")
+    id_clients = websocket.recv()
+
+    if id_clients == "F": return
+
+    for msg in lider_recv:
+        for id_client in id_clients:
+            mensagem_final = f"{id_emissor}M{id_client}{msg[3:]}"
+
+            websocket.send(mensagem_final)
+            conn.add_message(mensagem_final)
+            message = websocket.recv()
+            print(f"Received: {message}")
+
+    return

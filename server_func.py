@@ -234,12 +234,46 @@ async def lider_messages(
     """
     if len(message) < 4: await websocket.send("F")
 
+    id_emissor = message[0]
+    id_group = int(message[2])
+    group = group_list[id_group - 1]
+    id_lider = group.lider_id
+    messages = message[3:]
+    message_aux = messages.split("/?")
+
+    for msg in message_aux:
+        mensage_final = f"{id_emissor}L{id_lider}{msg}"
+        connections_buff[int(id_lider) - 1].add_message(mensage_final)
+    
+    await websocket.send("T")
+    return 
+
+#send semi-ativa messages
+async def servos_in_group(
+    message: ws.Data,
+    websocket: ws.WebSocketServerProtocol,
+    group_list: list[Group]
+):
+    """
+    Estrutura da mensagem:
+    XSY
+    X => id_emissor (acoplado pelo cliente)
+    S => identificador da funcao
+    Y => id_grupo que se quer saber os servos
+
+    exemplo:
+    caso 1 um nodo queira saber os servos do grupo 2: 3S2
+    """
+    if len(message) < 3: await websocket.send("F")
+
     id_group = int(message[2])
     group = group_list[id_group - 1]
     id_lider = group.lider_id
     
-    mensage_final = message[0:2] + id_lider + message[3:]
-    connections_buff[int(id_lider) - 1].add_message(mensage_final)
+    mensage_final = [id_client if not id_client == id_lider else None for id_client in group.id_clients]
+    mensage_final.remove(None)
+
+    if not mensage_final: await websocket.send("F")
     
-    await websocket.send("T")
+    await websocket.send(mensage_final)
     return 

@@ -2,7 +2,7 @@ import asyncio
 from websockets.sync.client import connect
 import sys
 from classes import Client
-from client_func import nack_received
+from client_func import nack_received, lider_received
 
 async def main():
     conn = Client(None, None)
@@ -22,7 +22,7 @@ async def main():
         while True:
             id_client = conn.id
             group = conn.group
-            msg = input(id_client + group + ":Enter message: ")
+            msg = input("Id" + id_client + "Gp" + group + conn.perfil + ":Enter message: ")
             websocket.send(id_client + msg)
             conn.add_message(id_client + msg)
             message = websocket.recv()
@@ -31,10 +31,14 @@ async def main():
             #ressend message if nack
             message_aux = message.split("/?")
             nack_recv: list[str] = []
+            lider_recv: list[str] = []
             for msg in message_aux:
                 if f"N{id_client}" in msg[1:3]:
                     nack_recv.append(msg)
+                elif f"L{id_client}" in msg[1:3]:
+                    lider_recv.append(msg)
 
             if nack_recv: await nack_received(conn, websocket, nack_recv, id_client)
+            if lider_recv: await lider_received(conn, websocket, lider_recv, id_client)
 
 asyncio.run(main())
