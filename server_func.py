@@ -183,7 +183,7 @@ async def peer_2_peer_messages(
     XMYZ[...](/?[Z[...]])
     X => id_emissor (acoplado pelo cliente)
     M => identificador da funcao
-    Y => id_mensagem que se quer enviar a(s) mensagem(ns)
+    Y => id_client que se quer enviar a(s) mensagem(ns)
     Z => id_mensagem (acoplada pelo nodo)
     [...] => corpo da mensagem
     caso queira se enviar mais de uma mensagem o separador '/?' deve ser usado entre uma mensagem e outra
@@ -202,8 +202,8 @@ async def peer_2_peer_messages(
     message_to = message[3:]
     message_aux = message_to.split("/?")
 
-    for message in message_aux:
-        connections_buff[id_client - 1].add_message(id_emissor + message)
+    for msg in message_aux:
+        connections_buff[id_client - 1].add_message(id_emissor + msg)
     
     await websocket.send("T")
     return 
@@ -219,28 +219,27 @@ async def lider_messages(
     Estrutura da mensagem:
     XLYZ[...](/?[Z[...]])
     X => id_emissor (acoplado pelo cliente)
-    M => identificador da funcao
-    Y => id_mensagem que se quer enviar a(s) mensagem(ns)
+    L => identificador da funcao
+    Y => id_grupo que se quer enviar a(s) mensagem(ns)
     Z => id_mensagem (acoplada pelo nodo)
     [...] => corpo da mensagem
     caso queira se enviar mais de uma mensagem o separador '/?' deve ser usado entre uma mensagem e outra
 
     exemplo:
-    caso 1 uma mensagem, nodo deve enviar M21mensagem
-    Será uma mensagem de id 1 e corpo "mensagem" para o cliente de id de 2
+    caso 1 uma mensagem, nodo deve enviar L21mensagem
+    Será uma mensagem de id 1 e corpo "mensagem" para o lider do grupo de id de 2
 
-    caso 2 multiplas mensagens, nodo deve enviar M22mensagem1/?3mensagem2/?4mensagem3
-    Serao 3 mensagengs de id 2, 3 e 4 e corpos "mensagem1", "mensagem2", "mensagem3" para o cliente de id de 2
+    caso 2 multiplas mensagens, nodo deve enviar L22mensagem1/?3mensagem2/?4mensagem3
+    Serao 3 mensagengs de id 2, 3 e 4 e corpos "mensagem1", "mensagem2", "mensagem3" para o lider do grupo de id de 2
     """
     if len(message) < 4: await websocket.send("F")
 
-    id_emissor = message[0]
-    id_client = int(message[2])
-    message_to = message[3:]
-    message_aux = message_to.split("/?")
-
-    for message in message_aux:
-        connections_buff[id_client - 1].add_message(id_emissor + message)
+    id_group = int(message[2])
+    group = group_list[id_group - 1]
+    id_lider = group.lider_id
+    
+    mensage_final = message[0:2] + id_lider + message[3:]
+    connections_buff[int(id_lider) - 1].add_message(mensage_final)
     
     await websocket.send("T")
     return 
