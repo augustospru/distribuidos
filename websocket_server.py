@@ -22,7 +22,7 @@ async def echo(websocket: ws.WebSocketServerProtocol):
             try:
                 match message_func:
                     case "G":
-                        await group_messages(message, websocket, group_list)
+                        await group_messages(message, websocket, group_list, connections_buff)
                     
                     case "H":
                         await has_messages(message, websocket, connections_buff, group_list)

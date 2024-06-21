@@ -39,7 +39,8 @@ async def add_connection(
 async def group_messages(
     message: ws.Data,
     websocket: ws.WebSocketServerProtocol, 
-    group_list: list[Group]
+    group_list: list[Group],
+    connections_buff: list[Connection]
 ):
     """
     Estrutura da mensagem:
@@ -61,12 +62,15 @@ async def group_messages(
     if len(message) < 5: await websocket.send("F")
 
     id_emissor = message[0]
-    id_group = int(message[2])
+    id_group = message[2]
     message_to = message[3:]
     message_aux = message_to.split("/?")
+    group = group_list[int(id_group) - 1]
 
-    for message in message_aux:
-        group_list[id_group - 1].add_message(id_emissor + message)
+    for msg in message_aux:
+        for id_client in group.id_clients:
+            mensagem_final = id_emissor + "G" + id_group + msg
+            connections_buff[int(id_client) - 1].add_message(mensagem_final)
     
     await websocket.send("T")
     return 
