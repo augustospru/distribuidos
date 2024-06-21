@@ -21,7 +21,7 @@ async def add_connection(
 
     id_group = ""
     if len(message) > 1: id_group = message[1] #add presend group
-    else: id_group = str(random.randrange(3)) #add to random group
+    else: id_group = str(random.randrange(1,4)) #add to random group
 
     client = Connection(str(last_id), True, perfil, id_group)
 
@@ -115,9 +115,29 @@ async def assert_messages(
     message: ws.Data,
     websocket: ws.WebSocketServerProtocol, 
     connections_buff: list[Connection],
-    has_lider: bool
+    group_list: list[Group]
 ):
-    print(message)
+    """
+    Estrutura da mensagem:
+    XAYZB[B...]
+    X => id_emissor (acoplado pelo cliente)
+    A => identificador da funcao
+    Y => id_grupo
+    Z => id_emissor_original
+    B => ids das mensagens recebidas
+
+    exemplo:
+    caso 1 quero informar ao grupo 2 que recebi as mensagens 1, 2 e 3 do emissor 4: A24123
+    """
+    if len(message) < 5: await websocket.send("F")
+
+    group = group_list[int(message[2]) - 1]
+
+    for client in group.id_clients:
+        id_emissor = message[0]
+        id_client = client
+        if id_emissor == id_client: continue #nao envia para si  mesmo
+        connections_buff[int(id_client) - 1].add_message(message)
     
     await websocket.send("T")
     return 

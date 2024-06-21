@@ -30,7 +30,7 @@ async def echo(websocket: ws.WebSocketServerProtocol):
                         await has_messages(message, websocket, connections_buff, group_list)
 
                     case "A":
-                        await assert_messages(message, websocket, connections_buff, has_lider)
+                        await assert_messages(message, websocket, connections_buff, group_list)
 
                     case "N":
                         await nack_messages(message, websocket, connections_buff)

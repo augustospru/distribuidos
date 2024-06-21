@@ -1,6 +1,3 @@
-import sys
+import random
 
-def main():
-    print(sys.argv[1:])
-
-main()
+print(random.randrange(8, 10))

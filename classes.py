@@ -39,14 +39,12 @@ class Client:
         self.message_send.append(message)
 
 class Group:
-    id: str | None = None
     message_buffer: str | None = None
-    id_clients: list[str] = []
-    list_nacks: list[str] = []
     lider_id: str | None = None
 
     def __init__(self, id):
         self.id = id
+        self.id_clients: list[str] = []
 
     def add_client(self, id_client):
         self.id_clients.append(id_client)
