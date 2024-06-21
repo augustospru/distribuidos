@@ -2,20 +2,18 @@ import asyncio
 from websockets.server import serve
 import websockets as ws
 from classes import Connection, Group
-from server_func import add_connection, group_messages, assert_messages, has_messages, nack_messages, peer_2_peer_messages
+from server_func import add_connection, group_messages, assert_messages, has_messages, nack_messages, peer_2_peer_messages, lider_messages
 
 connections_buff: list[Connection] = []
-has_lider = False
 group_list: list[Group] = [Group("1"), Group("2"), Group("3")]
 
 async def echo(websocket: ws.WebSocketServerProtocol):
-    global has_lider
     async for message in websocket:
         print(message)
 
         #new connection
         if message[0] == "C":
-            has_lider = await add_connection(message, websocket, connections_buff, group_list, has_lider)
+            await add_connection(message, websocket, connections_buff, group_list)
 
         else:
             id_client = int(message[0])
@@ -37,6 +35,9 @@ async def echo(websocket: ws.WebSocketServerProtocol):
 
                     case "M":
                         await peer_2_peer_messages(message, websocket, connections_buff)
+
+                    case "L":
+                        await lider_messages(message, websocket, connections_buff, group_list)
                             
                     case _:
                         await websocket.send("F")

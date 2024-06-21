@@ -7,30 +7,33 @@ async def add_connection(
     message: ws.Data,
     websocket: ws.WebSocketServerProtocol, 
     connections_buff: list[Connection],
-    group_list: list[Group],
-    has_lider: bool
+    group_list: list[Group]
 ):
     last_id = 1
     if connections_buff:
         last_id = max(int(conn.id) for conn in connections_buff) + 1
 
-    perfil = "S"
-    if not has_lider: 
-        perfil = "L"
-        has_lider = True
+    has_lider = False
 
     id_group = ""
     if len(message) > 1: id_group = message[1] #add presend group
     else: id_group = str(random.randrange(1,4)) #add to random group
+
+    group = group_list[int(id_group) - 1]
+
+    perfil = "S"
+    if not group.lider_id: 
+        perfil = "L"
+        group.lider_id = str(last_id)
 
     client = Connection(str(last_id), True, perfil, id_group)
 
     await websocket.send(str(last_id) + perfil + id_group)
 
     connections_buff.append(client)
-    group_list[int(client.group) - 1].add_client(client.id)
+    group.add_client(client.id)
 
-    return has_lider
+    return
 
 #send messages to a group
 async def group_messages(
@@ -178,6 +181,43 @@ async def peer_2_peer_messages(
     """
     Estrutura da mensagem:
     XMYZ[...](/?[Z[...]])
+    X => id_emissor (acoplado pelo cliente)
+    M => identificador da funcao
+    Y => id_mensagem que se quer enviar a(s) mensagem(ns)
+    Z => id_mensagem (acoplada pelo nodo)
+    [...] => corpo da mensagem
+    caso queira se enviar mais de uma mensagem o separador '/?' deve ser usado entre uma mensagem e outra
+
+    exemplo:
+    caso 1 uma mensagem, nodo deve enviar M21mensagem
+    Será uma mensagem de id 1 e corpo "mensagem" para o cliente de id de 2
+
+    caso 2 multiplas mensagens, nodo deve enviar M22mensagem1/?3mensagem2/?4mensagem3
+    Serao 3 mensagengs de id 2, 3 e 4 e corpos "mensagem1", "mensagem2", "mensagem3" para o cliente de id de 2
+    """
+    if len(message) < 4: await websocket.send("F")
+
+    id_emissor = message[0]
+    id_client = int(message[2])
+    message_to = message[3:]
+    message_aux = message_to.split("/?")
+
+    for message in message_aux:
+        connections_buff[id_client - 1].add_message(id_emissor + message)
+    
+    await websocket.send("T")
+    return 
+
+#send semi-ativa messages
+async def lider_messages(
+    message: ws.Data,
+    websocket: ws.WebSocketServerProtocol, 
+    connections_buff: list[Connection],
+    group_list: list[Group]
+):
+    """
+    Estrutura da mensagem:
+    XLYZ[...](/?[Z[...]])
     X => id_emissor (acoplado pelo cliente)
     M => identificador da funcao
     Y => id_mensagem que se quer enviar a(s) mensagem(ns)
