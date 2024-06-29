@@ -2,7 +2,7 @@ import asyncio
 from websockets.sync.client import connect
 import sys
 from classes import Client
-from client_func import nack_received, lider_received
+from client_func import nack_received, lider_received, send_assert
 
 async def main():
     conn = Client(None, None)
@@ -46,11 +46,11 @@ async def main():
                     group_recv.setdefault(sender_group,[]).append(msg[3]) #save id_message
                     # group_recv.append(msg[3]) #save id_message
                 elif f"A{group}" in msg[1:3]:
-                    assert_recv.append(msg[3]) #save id_message
+                    assert_recv.append(msg) #save id_message
 
             if nack_recv: await nack_received(conn, websocket, nack_recv, id_client)
             if lider_recv: await lider_received(conn, websocket, lider_recv, id_client)
-            if group_recv: print("messages:", group_recv) #send_assert()
+            if group_recv: await send_assert(conn, websocket, group_recv, id_client) #send_assert()
             if assert_recv: print("messages:", assert_recv) #check messages and send_nack() or ok
 
 asyncio.run(main())

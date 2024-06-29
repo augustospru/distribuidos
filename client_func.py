@@ -44,17 +44,35 @@ async def lider_received(conn: Client, websocket: ClientConnection, lider_recv: 
 
 async def send_assert(conn: Client, websocket: ClientConnection, group_recv: dict, id_emissor: str):
 
-    # for msg in group_recv:
-    #     mensagem_final = f"{id_emissor}M{id_client}{msg[3:]}"
-
-    #     websocket.send(mensagem_final)
-    #     conn.add_message(mensagem_final)
-    #     message = websocket.recv()
-    #     print(f"Received: {message}")
+    for sender_group, message_ids in group_recv.items():
+        ids_recv = "".join(message_ids)
+        mensagem_final = f"{id_emissor}A{sender_group[2]}{sender_group[0]}{ids_recv}"
+        websocket.send(mensagem_final)
+        conn.add_message(mensagem_final)
+        message = websocket.recv()
+        print(f"Received: {message}")
 
     return
 
 async def send_nack(conn: Client, websocket: ClientConnection, assert_recv: list[str], id_emissor: str):
+
+    # websocket.send(f"{id_emissor}S{conn.group}")
+    # id_clients = websocket.recv()
+
+    # if id_clients == "F": return
+
+    # for msg in assert_recv:
+    #     for id_client in id_clients:
+    #         mensagem_final = f"{id_emissor}M{id_client}{msg[3:]}"
+
+    #         websocket.send(mensagem_final)
+    #         conn.add_message(mensagem_final)
+    #         message = websocket.recv()
+    #         print(f"Received: {message}")
+
+    return
+
+async def assert_received(conn: Client, websocket: ClientConnection, assert_recv: list[str], id_emissor: str):
 
     # websocket.send(f"{id_emissor}S{conn.group}")
     # id_clients = websocket.recv()
