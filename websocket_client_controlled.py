@@ -2,15 +2,19 @@ import asyncio
 from websockets.sync.client import connect
 import sys
 from classes import Client
-from client_func import nack_received, lider_received, send_assert
+from client_func import nack_received, lider_received, send_assert, assert_received
 
 async def main():
     conn = Client(None, None)
     with connect("ws://localhost:8765") as websocket:
         args = sys.argv[1:]
         id_group = ""
+        falty = False
         if args and args[0] == '-g': 
             id_group = args[1]
+
+        if args and '-f' in args: 
+            falty = True
             
         if not conn.id:
             websocket.send("C" + id_group)
@@ -19,6 +23,7 @@ async def main():
             conn.perfil = message[1]
             conn.group = message[2]
 
+        group_recv = {}
         while True:
             id_client = conn.id
             group = conn.group
@@ -28,13 +33,12 @@ async def main():
             message = websocket.recv()
             print(f"Received: {message}")
 
-            if message == "F": continue
+            if message == "F" or message == "T": continue
             
-            #ressend message if nack
+            #functions when receiving
             message_aux = message.split("/?")
             nack_recv: list[str] = []
             lider_recv: list[str] = []
-            group_recv = {}
             assert_recv: list[str] = []
             for msg in message_aux:
                 if f"N{id_client}" in msg[1:3]:
@@ -51,6 +55,6 @@ async def main():
             if nack_recv: await nack_received(conn, websocket, nack_recv, id_client)
             if lider_recv: await lider_received(conn, websocket, lider_recv, id_client)
             if group_recv: await send_assert(conn, websocket, group_recv, id_client) #send_assert()
-            if assert_recv: print("messages:", assert_recv) #check messages and send_nack() or ok
+            if group_recv and assert_recv: await assert_received(conn, websocket, assert_recv, group_recv, id_client, falty) #check messages and send_nack() or ok
 
 asyncio.run(main())
