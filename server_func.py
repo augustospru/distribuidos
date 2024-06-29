@@ -130,7 +130,7 @@ async def assert_messages(
     X => id_emissor (acoplado pelo cliente)
     A => identificador da funcao
     Y => id_grupo
-    Z => id_emissor_original
+    Z => id_emissor_original (acoplado pelo cliente)
     B => ids das mensagens recebidas
 
     exemplo:
@@ -160,7 +160,7 @@ async def nack_messages(
     XNYZ[Z..]
     X => id_emissor (acoplado pelo cliente)
     N => identificador da funcao
-    Y => id_emissor_original da mensagem
+    Y => id_emissor_original da mensagem (acoplado pelo cliente)
     Z => id_mensagem perida
 
     exemplo:
@@ -202,12 +202,12 @@ async def peer_2_peer_messages(
     if len(message) < 4: await websocket.send("F")
 
     id_emissor = message[0]
-    id_client = int(message[2])
+    id_client = message[2]
     message_to = message[3:]
     message_aux = message_to.split("/?")
 
     for msg in message_aux:
-        connections_buff[id_client - 1].add_message(id_emissor + msg)
+        connections_buff[int(id_client) - 1].add_message(id_emissor + "M" + id_client + msg)
     
     await websocket.send("T")
     return 

@@ -27,18 +27,28 @@ async def main():
             conn.add_message(id_client + msg)
             message = websocket.recv()
             print(f"Received: {message}")
+
+            if message == "F": continue
             
             #ressend message if nack
             message_aux = message.split("/?")
             nack_recv: list[str] = []
             lider_recv: list[str] = []
+            group_recv: list[str] = []
+            assert_recv: list[str] = []
             for msg in message_aux:
                 if f"N{id_client}" in msg[1:3]:
-                    nack_recv.append(msg)
+                    nack_recv.append(msg) # save all nack messages
                 elif f"L{id_client}" in msg[1:3]:
-                    lider_recv.append(msg)
+                    lider_recv.append(msg) # save all lider messages
+                elif f"G{group}" in msg[1:3]:
+                    group_recv.append(msg[3]) #save id_message
+                elif f"A{group}" in msg[1:3]:
+                    assert_recv.append(msg[3]) #save id_message
 
             if nack_recv: await nack_received(conn, websocket, nack_recv, id_client)
             if lider_recv: await lider_received(conn, websocket, lider_recv, id_client)
+            if group_recv: await print("messages:", group_recv) #send_assert()
+            if assert_recv: await print("messages:", assert_recv) #check messages and send_nack() or ok
 
 asyncio.run(main())
