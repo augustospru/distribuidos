@@ -54,10 +54,6 @@ async def send_assert(conn: Client, websocket: ClientConnection, group_recv: dic
 
     return
 
-async def send_nack(conn: Client, websocket: ClientConnection, nack_list: list[str], id_emissor: str):
-
-    return
-
 async def assert_received(conn: Client, websocket: ClientConnection, assert_recv: list[str], group_recv: dict, id_emissor: str, falty: bool = False):
 
     for message in assert_recv:
@@ -81,6 +77,12 @@ async def assert_received(conn: Client, websocket: ClientConnection, assert_recv
 
             if nack_list: 
                 print(f"NACK ids {nack_list}")
-                # await send_nack(conn, websocket, nack_list, id_emissor)
+                #send NACK
+                ids_nack = "".join(nack_list)
+                mensagem_final = f"{id_emissor}N{id_emissor_original}{ids_nack}"
+                websocket.send(mensagem_final)
+                conn.add_message(mensagem_final)
+                message = websocket.recv()
+                print(f"Received: {message}")
 
     return
