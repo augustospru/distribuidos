@@ -23,19 +23,19 @@ O sistema é composto por 3 arquivos principais:
    Cliente controlado que envia mensagens como bem entender do usuario
 
 Para inicializar o sistema é necessário iniciar primeiro o websocket_server.py usando:
-```http
+```
   python ./websocket_server.py
 ```
 
 Ao ser inicializado os clientes podem se conectar e começar a se comunicar. Para iniciar um cliente é usado o comando:
-```http
+```
   python ./websocket_client.py -g x
 ```
 Onde -g é a flag para usar um grupo predefinido e em x se informa o id grupo fara parte o nodo. Atualmente só temos 3 grupos de ids [1,2,3]. Se a flag nao for explicitada o grupo é aleatorio.
 
 Para testes conseguimos usar um cliente controlado para enviar mensagens à grupos ou nodos especificos.
 Para iniciar um cliente controlado é usado o comando:
-```http
+```
   python ./websocket_client_controlled.py -g x -f
 ```
 Onde -g é a flag para usar um grupo predefinido e em x se informa o id grupo fara parte o nodo. Atualmente só temos 3 grupos de ids [1,2,3]. Se a flag nao for explicitada o grupo é aleatorio.
@@ -180,7 +180,7 @@ Enviado pelo proprio cliente ao se conectar nao podendo ser enviado novamente.
   Z => id_mensagem perida
 
     exemplo:
-    caso 1 duas mensagens perdidas: 3N116
+    caso 1 duas mensagens perdidas: N116
     Informará ao emissor original de id 1 que as mensagens 1 e 6 nao chegaram ao cliente
 ### S
   XSY
@@ -189,6 +189,6 @@ Enviado pelo proprio cliente ao se conectar nao podendo ser enviado novamente.
   Y => id_grupo que se quer saber os servos
 
     exemplo:
-    caso 1 um nodo queira saber os servos do grupo 2: 3S2
+    caso 1 um nodo queira saber os servos do grupo 2: S2
 
 
