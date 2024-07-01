@@ -78,7 +78,7 @@ Enviado pelo proprio cliente ao se conectar nao podendo ser enviado novamente.
 
 ### M
 
-  XMYZ[...](/?[Z[...]])
+  XMYZ`[...](/?[Z[...]])`
 
   X => id_emissor (acoplado pelo cliente)
 
@@ -101,7 +101,7 @@ Enviado pelo proprio cliente ao se conectar nao podendo ser enviado novamente.
 
 ### G
 
-  XGYZ[...](/?[Z[...]])
+  XGYZ`[...](/?[Z[...]])`
 
   X => id_emissor (acoplado pelo cliente)
 
@@ -122,7 +122,7 @@ Enviado pelo proprio cliente ao se conectar nao podendo ser enviado novamente.
     caso 2 multiplas mensagens, nodo deve enviar G22mensagem1/?3mensagem2/?4mensagem3
     Serao 3 mensagengs de id 2, 3 e 4 e corpos "mensagem1", "mensagem2", "mensagem3" em grupo para o grupo 2
 ### L
-  XLYZ[...](/?[Z[...]])
+  XLYZ`[...](/?[Z[...]])`
 
   X => id_emissor (acoplado pelo cliente)
 
@@ -154,7 +154,7 @@ Enviado pelo proprio cliente ao se conectar nao podendo ser enviado novamente.
     exemplo:
     caso quero receber mensagem que enviaram ao cliente, nodo deve enviar HP
 ### A
-  XAYZB[B...]
+  XAYZB`[B...]`
 
   X => id_emissor (acoplado pelo cliente)
 
@@ -169,7 +169,7 @@ Enviado pelo proprio cliente ao se conectar nao podendo ser enviado novamente.
     exemplo:
     caso 1 quero informar ao grupo 2 que recebi as mensagens 1, 2 e 3 do emissor 4: A24123
 ### N
-  XNYZ[Z..]
+  XNYZ`[Z..]`
 
   X => id_emissor (acoplado pelo cliente)
 
